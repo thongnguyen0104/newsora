@@ -12,6 +12,18 @@ Báo điện tử (kiểu Thanh Niên / Tuổi Trẻ) xây dựng trên **Next.j
 
 Yêu cầu: Node.js ≥ 20.9.
 
+### Cách nhanh nhất (PowerShell)
+
+Một lệnh chạy cả trang báo, trang quản trị và API. Script tự cài dependencies, tạo `.env` và chuẩn bị database:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\deploy\run.ps1           # chế độ dev
+powershell -ExecutionPolicy Bypass -File .\deploy\run.ps1 -Seed     # kèm dữ liệu mẫu
+powershell -ExecutionPolicy Bypass -File .\deploy\run.ps1 -Mode prod -Port 8080   # build production rồi chạy
+```
+
+### Chạy thủ công
+
 ```bash
 npm install
 cp .env.example .env          # rồi đặt PAYLOAD_SECRET
@@ -72,10 +84,16 @@ Hoặc tạo trên web tại https://app.turso.tech.
 
 ### 2. Tạo bucket Oracle Object Storage
 
-1. Vào **Storage → Buckets → Create Bucket**, ví dụ đặt tên `newsora-media`.
-2. Để ảnh tải nhanh qua CDN, vào bucket, chọn **Edit Visibility → Public**.
-3. **Profile → Customer secret keys → Generate secret key**. Cặp key này là `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY`.
+1. Vào **Storage → Object Storage → Buckets → Create Bucket**, đặt tên `newsora-media` và giữ các tùy chọn mặc định.
+2. Để ảnh tải nhanh từ Oracle, mở bucket và chọn **Edit Visibility → Public**. Bỏ chọn *Allow users to list objects* để người ngoài không xem được danh sách file.
+3. **Profile → Customer secret keys → Generate secret key**. Cặp key này là `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY`. Có thể dùng chung một cặp key cho nhiều bucket.
 4. Lấy **namespace** tại Profile → Tenancy → *Object storage namespace*, và **region**, ví dụ `ap-singapore-1`.
+
+> ⚠️ Nên dùng một **bucket riêng** chỉ để chứa ảnh của trang báo. Không bật Public cho bucket đang chứa dữ liệu khác như backup, vì khi đó ai cũng tải được các file trong bucket.
+>
+> Nếu buộc phải dùng chung bucket, hãy để bucket ở chế độ Private, đặt `S3_PREFIX=newsora` để ảnh nằm trong thư mục riêng, và **không** đặt `S3_PUBLIC_URL`.
+
+Kiểm tra trên máy: điền các biến `S3_*` vào `.env` rồi chạy lại `deploy\run.ps1`. Ảnh upload trong `/admin` sẽ được lưu lên bucket thay vì thư mục `media/`. Ảnh cũ trong `media/` không tự chuyển sang bucket. Nếu chỉ có dữ liệu mẫu, có thể xóa `newsora.db` và thư mục `media/` rồi chạy `deploy\run.ps1 -Seed` để tạo lại.
 
 ### 3. Import project vào Vercel
 
@@ -94,6 +112,7 @@ Hoặc tạo trên web tại https://app.turso.tech.
 | `S3_ACCESS_KEY_ID` | Access key |
 | `S3_SECRET_ACCESS_KEY` | Secret key |
 | `S3_PUBLIC_URL` | (nếu bucket Public) `https://objectstorage.<region>.oraclecloud.com/n/<namespace>/b/newsora-media/o` |
+| `S3_PREFIX` | (tuỳ chọn) thư mục trong bucket, ví dụ `newsora` |
 
 3. Bấm **Deploy**, sau đó vào `https://<domain>/admin` để tạo tài khoản quản trị đầu tiên.
 

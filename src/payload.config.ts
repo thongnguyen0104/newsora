@@ -57,14 +57,18 @@ export default buildConfig({
     // Lưu ảnh lên Oracle Cloud Object Storage (API tương thích S3). Không cấu hình thì lưu vào thư mục /media
     s3Storage({
       enabled: Boolean(process.env.S3_BUCKET),
+      // Luôn thêm cột `prefix` để schema giống nhau dù có bật S3 hay không (tránh lệch migration)
+      alwaysInsertFields: true,
       collections: {
-        media: s3PublicUrl
-          ? {
-              disablePayloadAccessControl: true,
-              generateFileURL: ({ filename, prefix }) =>
-                [s3PublicUrl, prefix, filename].filter(Boolean).join('/'),
-            }
-          : true,
+        media: {
+          // Thư mục trong bucket, ví dụ "newsora" -> newsora/ten-anh.jpg
+          prefix: process.env.S3_PREFIX || undefined,
+          ...(s3PublicUrl && {
+            disablePayloadAccessControl: true,
+            generateFileURL: ({ filename, prefix }) =>
+              [s3PublicUrl, prefix, filename].filter(Boolean).join('/'),
+          }),
+        },
       },
       bucket: process.env.S3_BUCKET || '',
       config: {
