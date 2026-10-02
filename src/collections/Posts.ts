@@ -2,6 +2,7 @@ import { APIError, type CollectionConfig } from 'payload'
 
 import { authenticated, hasRole, isAdminOrEditor, publishedOrAuthenticated } from '../access'
 import { slugField } from '../fields/slug'
+import { normalizeUnicode } from '../hooks/normalizeUnicode'
 import { revalidateAfterChange, revalidateAfterDelete } from '../hooks/revalidate'
 
 export const Posts: CollectionConfig = {
@@ -33,6 +34,7 @@ export const Posts: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
+      normalizeUnicode,
       ({ data, req }) => {
         if (data._status === 'published') {
           if (req.user && hasRole(req, 'author')) {
