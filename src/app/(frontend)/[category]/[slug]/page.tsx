@@ -1,9 +1,9 @@
-import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound, permanentRedirect } from 'next/navigation'
 
 import { CoverImage } from '@/components/CoverImage'
+import { PostContent } from '@/components/PostContent'
 import { PostCard } from '@/components/PostCard'
 import { SectionTitle } from '@/components/SectionTitle'
 import { asCategory, asMedia, asUser, formatDateTime, mediaUrl, postUrl } from '@/lib/format'
@@ -89,7 +89,7 @@ export default async function PostPage({ params }: Props) {
           </figure>
         )}
 
-        <RichText
+        <PostContent
           data={post.content}
           className="prose prose-lg mt-6 max-w-none font-serif prose-headings:font-sans prose-a:text-brand-600"
         />

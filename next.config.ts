@@ -8,6 +8,8 @@ const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
   images: {
+    // Ảnh đã upload không đổi nội dung: giữ cache 30 ngày để hạn chế request tới Object Storage
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [{ protocol: 'https', hostname: '**.oraclecloud.com' }],
     localPatterns: [
       {
