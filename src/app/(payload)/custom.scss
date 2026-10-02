@@ -1,0 +1,5 @@
+// Font serif mặc định của Payload bắt đầu bằng Georgia, vốn thiếu glyph tiếng Việt
+// (ế, ề, ầ, ố…): trình duyệt phải ghép dấu rời nên dấu hiển thị lệch trong ô soạn thảo.
+:root {
+  --font-serif: 'Noto Serif', 'Times New Roman', 'Charis SIL', serif;
+}
